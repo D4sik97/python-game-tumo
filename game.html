@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shadow Arena</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@400;600&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+</head>
+<link rel="stylesheet" href="./css/game.css">
+<body>
+ 
+<div id="flash-overlay"></div>
+ 
+<div id="game-root">
+ 
+  <!-- TITLE SCREEN -->
+  <div id="title-screen">
+    <div class="title-emblem">⚔️</div>
+    <h1 class="game-title">
+      Shadow Arena
+      <span>Enter the Darkness</span>
+    </h1>
+    <p class="title-desc">
+      Brave the cursed arena. Face monsters of shadow and steel.
+      Fortune favors the bold — but the dice gods are fickle.
+    </p>
+    <button class="btn-primary" onclick="startGame()">⚔ Enter Arena</button>
+  </div>
+ 
+  <!-- BATTLE SCREEN -->
+  <div id="battle-screen" style="display:none; flex-direction:column; gap:14px;">
+ 
+    <div id="stage-info">
+      <span id="stage-label">ARENA · STAGE 1</span>
+      <div id="stage-icons" class="stage-enemies"></div>
+    </div>
+ 
+    <!-- COMBATANT CARDS -->
+    <div id="battle-header">
+ 
+      <div class="combatant-card player-card panel">
+        <div style="display:flex; justify-content:space-between; align-items:start;">
+          <div>
+            <div class="combatant-name" id="player-name">Warrior</div>
+            <div class="stat-chips" style="margin-top:6px;">
+              <span class="chip chip-gold" id="player-atk">⚔ ATK 12</span>
+              <span class="chip chip-blue" id="player-def">🛡 DEF 3</span>
+              <span class="chip chip-luck" id="player-luck">🍀 LCK 5</span>
+            </div>
+          </div>
+          <span class="combatant-emoji">🧙</span>
+        </div>
+        <div class="hp-bar-wrap">
+          <div style="display:flex; justify-content:space-between;">
+            <span class="hp-label">HP</span>
+            <span class="hp-label" id="player-hp-label">100 / 100</span>
+          </div>
+          <div class="hp-track">
+            <div class="hp-fill" id="player-hp-bar" style="width:100%; background:var(--hp-green);"></div>
+          </div>
+        </div>
+        <div class="status-effects" id="player-statuses"></div>
+      </div>
+ 
+      <div class="vs-badge">VS</div>
+ 
+      <div class="combatant-card enemy-card panel">
+        <div style="display:flex; justify-content:space-between; align-items:start;">
+          <span class="combatant-emoji" id="enemy-emoji">💀</span>
+          <div style="text-align:right;">
+            <div class="combatant-name" id="enemy-name">Skeleton</div>
+            <div class="stat-chips" style="justify-content:flex-end; margin-top:6px;">
+              <span class="chip chip-red" id="enemy-atk">⚔ ATK 8</span>
+              <span class="chip chip-blue" id="enemy-def">🛡 DEF 1</span>
+            </div>
+          </div>
+        </div>
+        <div class="hp-bar-wrap">
+          <div style="display:flex; justify-content:space-between;">
+            <span class="hp-label" id="enemy-hp-label">60 / 60</span>
+            <span class="hp-label">HP</span>
+          </div>
+          <div class="hp-track">
+            <div class="hp-fill" id="enemy-hp-bar" style="width:100%; background:var(--accent); transform:scaleX(1); transform-origin:right;"></div>
+          </div>
+        </div>
+        <div class="status-effects" id="enemy-statuses" style="justify-content:flex-end;"></div>
+      </div>
+ 
+    </div>
+ 
+    <!-- ARENA / LOG -->
+    <div id="arena-display">
+      <div id="battle-log"></div>
+    </div>
+ 
+    <!-- ACTIONS -->
+    <div id="action-panel">
+      <button class="action-btn attack" onclick="doAction('attack')" id="btn-attack">
+        <span class="btn-icon">⚔️</span>
+        <span>Attack</span>
+        <span class="btn-chance">70% hit · 20% crit</span>
+      </button>
+      <button class="action-btn defend" onclick="doAction('defend')" id="btn-defend">
+        <span class="btn-icon">🛡️</span>
+        <span>Defend</span>
+        <span class="btn-chance">Block next hit</span>
+      </button>
+      <button class="action-btn heal" onclick="doAction('heal')" id="btn-heal">
+        <span class="btn-icon">💚</span>
+        <span>Heal</span>
+        <span class="btn-chance" id="heal-chance">Uses: 3</span>
+      </button>
+      <button class="action-btn special" onclick="doAction('special')" id="btn-special">
+        <span class="btn-icon" id="special-icon">⚡</span>
+        <span id="special-name">Thunderstrike</span>
+        <span class="btn-chance" id="special-chance">Uses: 2</span>
+      </button>
+    </div>
+ 
+    <!-- STATS BAR -->
+    <div id="stats-bar">
+      <div class="stat-item">🏆 <span>Stage</span> <span class="stat-val" id="stat-stage">1</span></div>
+      <div class="stat-item">⚔️ <span>Kills</span>  <span class="stat-val" id="stat-kills">0</span></div>
+      <div class="stat-item">
+        🍀 <span>Luck</span>
+        <div class="luck-track" id="luck-track"></div>
+      </div>
+      <div class="stat-item">💎 <span>Items</span> <span class="stat-val" id="stat-items">0</span></div>
+    </div>
+ 
+  </div>
+ 
+  <!-- LOOT SCREEN -->
+  <div id="loot-screen">
+    <div class="loot-title">⚔ Victory! ⚔</div>
+    <p style="text-align:center; font-style:italic; color:var(--text-dim);">Choose your reward from the fallen foe's possessions.</p>
+    <div class="loot-grid" id="loot-grid"></div>
+    <div style="text-align:center;">
+      <button class="btn-primary" onclick="nextEnemy()" style="margin-top:8px;">Continue to Next Battle →</button>
+    </div>
+  </div>
+ 
+  <!-- GAME OVER / WIN -->
+  <div id="gameover-screen">
+    <div class="go-title" id="go-title">DEFEATED</div>
+    <div id="go-message" style="color:var(--text-dim); font-style:italic; font-size:16px;"></div>
+    <div class="go-stats" id="go-stats"></div>
+    <button class="btn-primary" onclick="startGame()">↺ Rise Again</button>
+  </div>
+ 
+</div>
+ 
+<script src="game.js"></script>
+
+</body>
+</html>
+ 
