@@ -10,108 +10,92 @@
 <body>
  
 
+<div class="game-shell">
+  <canvas id="canvas-bg"></canvas>
+  <div class="game-content">
 
-<div id="app">
-  <h2 class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)">Treasure Hunter
-    — probability simulation game for opening dungeon chests</h2>
-
-  <div class="title-row">
-    <span style="font-size:28px" aria-hidden="true">🏹</span>
-    <h2>Treasure Hunter</h2>
-    <span class="badge">Probability Simulator</span>
-  </div>
-
-  <div class="controls">
-    <button class="charm-btn" id="charmBtn" onclick="toggleCharm()" aria-pressed="false">
-      <span>🍀</span> Lucky Charm
-    </button>
-    <button class="open-btn" onclick="openChest()">Open Chest</button>
-    <span style="font-size:13px; color:var(--color-text-secondary)" id="openCount">0 chests opened</span>
-  </div>
-
-  <div class="chest-display">
-    <div class="chest-icon" id="chestIcon"><img src="./gift.png" alt="Chest"></div>
-    <div class="chest-label" id="chestLabel">Open a chest to see what's inside!</div>
-    <div class="chest-sublabel" id="chestSublabel"></div>
-  </div>
-
-  <div class="metrics">
-    <div class="metric">
-      <div class="m-label">Total Reward</div>
-      <div class="m-val" id="mGold">0</div>
-      <div class="m-sub">gold coins</div>
+    <div class="hdr">
+      <h1>⚔️ Shadow Arena: Treasure Hunter</h1>
+      <p>Probability Simulation · Reach 500 gold in 20 rounds</p>
     </div>
-    <div class="metric">
-      <div class="m-label">Rare Items</div>
-      <div class="m-val" id="mRare">0</div>
-      <div class="m-sub">found</div>
-    </div>
-    <div class="metric">
-      <div class="m-label">Traps Hit</div>
-      <div class="m-val" id="mTrap">0</div>
-      <div class="m-sub">ouch!</div>
-    </div>
-    <div class="metric">
-      <div class="m-label">Monsters</div>
-      <div class="m-val" id="mMon">0</div>
-      <div class="m-sub">defeated</div>
-    </div>
-  </div>
 
-  <div class="section-label">Loot Probabilities</div>
-  <table class="prob-table" id="probTable">
-    <thead>
-      <tr>
-        <th>Outcome</th>
-        <th>Base P</th>
-        <th>With Lucky Charm</th>
-        <th>Reward</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>💰 Gold</td>
-        <td>50%</td>
-        <td>45%</td>
-        <td>+10–50 coins</td>
-      </tr>
-      <tr>
-        <td>💎 Rare Item</td>
-        <td>10%</td>
-        <td><strong>25%</strong></td>
-        <td>+100 coins</td>
-      </tr>
-      <tr>
-        <td>💀 Trap</td>
-        <td>25%</td>
-        <td>20%</td>
-        <td>−20 coins</td>
-      </tr>
-      <tr>
-        <td>👹 Monster</td>
-        <td>15%</td>
-        <td>10%</td>
-        <td>+30 coins</td>
-      </tr>
-    </tbody>
-  </table>
+    <div class="stats-grid">
+      <div class="stat">
+        <div class="v" id="mGold">0</div>
+        <div class="l">💰 Gold</div>
+      </div>
+      <div class="stat">
+        <div class="v" id="rDisp">0/20</div>
+        <div class="l">⏱ Rounds</div>
+      </div>
+      <div class="stat">
+        <div class="v" id="mRare">0</div>
+        <div class="l">💎 Rare</div>
+      </div>
+      <div class="stat">
+        <div class="v" id="mTrap">0</div>
+        <div class="l">💀 Traps</div>
+      </div>
+      <div class="stat">
+        <div class="v" id="mMon">0</div>
+        <div class="l">👹 Monsters</div>
+      </div>
+      <div class="stat" id="bombStat">
+        <div class="v" id="mBomb">0</div>
+        <div class="l">💣 Bombs</div>
+      </div>
+    </div>
 
-  <div class="sim-row">
-    <button class="sim-btn" onclick="simulate()">▶ Run 10,000 Simulation</button>
-    <span class="sim-note" id="simNote">Press to run Monte Carlo simulation</span>
-  </div>
+    <div class="prog-wrap">
+      <div class="prog-info">
+        <span id="pLeft">20 rounds left</span>
+        <span id="pNeed">Need 500 more gold</span>
+      </div>
+      <div class="prog-bg">
+        <div class="prog-fill" id="pBar" style="width:0%"></div>
+      </div>
+    </div>
 
-  <div class="section-label" id="chartTitle" style="display:none">Loot Frequency Chart</div>
-  <div id="lootBars" style="margin-bottom:1.5rem;display:none"></div>
-  <div class="chart-wrap" id="chartWrap" style="display:none">
-    <canvas id="lootChart" role="img" aria-label="Bar chart showing loot frequency from 10,000 chest openings"></canvas>
+    <div class="ev-bar">
+      EV per chest: <span id="evOne">−2.0</span> &nbsp;·&nbsp; EV × 20 rounds: <span id="evAll">−40.0</span>
+    </div>
+
+    <div class="arena" style="position:relative">
+      <div class="arena-icon" id="aIcon">🎁</div>
+      <div id="rewardFlash" style="position:absolute;left:50%;transform:translateX(-50%);display:none"></div>
+      <div class="arena-label" id="aLabel">Open a chest to begin!</div>
+      <div class="arena-sub" id="aSub">Base EV is −2 coins — use Lucky Charm to flip it positive</div>
+    </div>
+
+    <div class="btns">
+      <button id="openBtn" onclick="openChest()">Open Chest</button>
+      <button id="charmBtn" onclick="toggleCharm()" aria-pressed="false">🍀 Lucky Charm</button>
+      <button onclick="showProbs()">📋 Probabilities</button>
+      <button onclick="runSim()">🎲 Simulate 10k</button>
+      <button id="rstBtn" onclick="resetGame()" style="display:none">↺ Restart</button>
+    </div>
+
+    <div class="outcome-box" id="outBox">
+      <div class="ob-icon" id="outIcon"></div>
+      <h3 id="outTitle"></h3>
+      <p id="outDesc"></p>
+      <button onclick="resetGame()">Play again</button>
+    </div>
+
+    <div class="sim-wrap" id="simWrap">
+      <div class="sim-h">Monte Carlo Simulation</div>
+      <div class="sim-n" id="simNote"></div>
+      <div id="lootBars"></div>
+      <div id="chartWrap"><canvas id="lootChart"></canvas></div>
+      <div id="probTable"></div>
+    </div>
+
   </div>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
-<script>
 
-</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+
 
  
 <script src="game.js"></script>
